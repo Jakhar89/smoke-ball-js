@@ -1,0 +1,18 @@
+
+//Wait until all promises resolve
+  const response = await Promise.all(apiPromises).then((val) => {
+    const arr = val.map((el) => {
+      return generateResponse(el);
+    });
+    return arr;
+  });
+
+  //----------
+  const response = Promise.all(apiPromises).then(val => new Promise((res,rej)=>{
+    const arr = val.map((el) => {
+      return generateResponse(el);
+    });
+    res(arr);
+  }));
+
+  //----
