@@ -9,18 +9,26 @@ const getArnieQuotes = async (urls) => {
   const apiPromises = [];
   for (url of urls) {
     const api = callApi(url);
-    const gen = api.then((val) => generateResObj(val));
-    apiPromises.push(gen);
+    apiPromises.push(api);
   }
   //Reply Promise to send as response
-  let reply = new Promise((res, rej) => res(Promise.all(apiPromises))).catch(
-    (err) => console.error(err)
-  );
+  const reply = await generateReplyPromise(apiPromises);
   return reply;
 };
 
+//Generate Reply promise
+const generateReplyPromise = (promises) =>
+  new Promise((res, rej) => {
+    const arr = Promise.all(promises).then((val) =>
+      val.map((el) => {
+        return generateResObj(el);
+      })
+    );
+    res(arr);
+  }).catch((error)=>console.error(error));
+
 //Destruct object
-const generateResObj = async (el) => {
+const generateResObj = (el) => {
   const status = el.status;
   const body = JSON.parse(el.body);
   switch (status) {
